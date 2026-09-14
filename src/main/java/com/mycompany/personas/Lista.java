@@ -103,22 +103,23 @@ public class Lista {
         Nodo q = p;
         Boolean swL=false;
         while(q!= null && swL==false && sw==false){
-            if (q.getCedula() == ced){
+            if (q.getCedula().equals(ced)){
                 sw= true;
                 swL= true;
+                System.out.println("Dato");
             }else{
                 if(q.getSw()==1){
-                   sw = mostrarInformacionPadre(q,ced,sw);
+                   sw = mostrarInformacionPadre(q.getLigaLista(),ced,sw);
                 }
                 q=q.getLiga();
             }
         }
         if(swL==true){
-            if( ancestro.getCedula()== ced){
+            if( ancestro.getCedula().equals(ced)){
                 System.out.println("El Ancestro no tiene padre");
             }
             else{
-                p.toString();
+                System.out.println(p.getPersona().toString());
             }
             
         }

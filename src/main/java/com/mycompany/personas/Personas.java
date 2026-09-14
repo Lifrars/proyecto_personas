@@ -24,8 +24,7 @@ public class Personas {
               + "2. Para insertar al final\n"
               + "3. Para mostrar\n"
               + "4. Para eliminar\n"
-                        + "5. Para \n"
-                        + "6. Para insertar datos prueba\n"
+              + "6. Para insertar datos prueba\n"
               + "5. Para salir");
 
             if (opcion == null) {
@@ -52,6 +51,7 @@ public class Personas {
                     if(sw==false){
                         System.out.println("No se encontro el dato");
                     }
+                    break;
                 case "3":
                     lista.mostrarTodo(lista.getAncestro());
                     break;
