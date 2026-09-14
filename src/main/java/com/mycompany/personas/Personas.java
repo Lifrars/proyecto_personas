@@ -23,7 +23,7 @@ public class Personas {
                 "1. Para insertar al principio\n"
               + "2. Para insertar al final\n"
               + "3. Para mostrar\n"
-              + "4. Para eliminar\n"
+              + "4. Para mostrar nivel registro \n"
               + "6. Para insertar datos prueba\n"
               + "5. Para salir");
 
@@ -56,6 +56,8 @@ public class Personas {
                     lista.mostrarTodo(lista.getAncestro());
                     break;
                 case "4":
+                    cedula = parseInt(JOptionPane.showInputDialog("Digite la cedula de la persona , para encontrar al padre "));
+                    lista.mostrarNivelCed(lista.getAncestro(), cedula);
                     break;
                 case "5":
                     break;
@@ -127,7 +129,8 @@ public static void cargarDatosPrueba(Lista lista) {
     lista.insertarPersona(lista.getAncestro(), nuevaPersona("Felipe Ramirez",   1252, "03/03/2013"), 1250);
 
     // 1800 se queda como hoja, sin hijos
-
+    // Nivel 4: hijo de 1252 (Felipe) -> 1000 > 1200 > 1250 > 1252 > 1255
+    lista.insertarPersona(lista.getAncestro(), nuevaPersona("Gabriel Ramirez", 1255, "11/11/2040"), 1252);
     JOptionPane.showMessageDialog(null, "Datos de prueba cargados (11 personas).");
 }
 

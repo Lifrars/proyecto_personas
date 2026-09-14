@@ -126,4 +126,40 @@ public class Lista {
         return sw;
       
     }
+    public void mostrarNivelCed(Nodo p, Integer ced) {
+        int nivel = mostrarNivelCed(p, ced, 0);
+        if (nivel == -1) {
+            System.out.println("No existe la persona con cedula " + ced);
+        } else {
+            System.out.println("Nivel dato: " + nivel);
+        }
+    }
+
+    public int mostrarNivelCed(Nodo p, Integer ced, Integer nivel) {
+
+        while (p != null) {
+
+            if (p.getCedula().equals(ced)) {
+                if (nivel == 0 && p != ancestro) {
+                    return 1;
+                }else{
+                    if(p==ancestro){
+                        return 0;
+                    }
+                     return nivel+1;
+                }
+               
+            } else {
+                if (p.getSw() == 1) {
+                    int r = mostrarNivelCed(p.getLigaLista().getLiga(), ced, nivel + 1);
+                    if (r != -1) {
+                        return r;
+                    }
+                }
+                p = p.getLiga();
+            }
+        }
+
+        return -1;
+    }
 }
