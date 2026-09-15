@@ -24,69 +24,71 @@ public class Lista {
     public void setAncestro(Nodo ancestro) {
         this.ancestro = ancestro;
     }
-    
-    public void insertarPersona(Nodo p,Persona persona,Integer cedula){
-        Boolean sw = false;
-     
-        if(ancestro==null){
-            ancestro=new Nodo(persona,null);
-        }else{
-            while(p!=null && sw== false){
-
-                if(p.getCedula().equals(cedula)){
-        
-                   sw=true;
-                }else{
-                    if(p.getSw()== 1){
-                         insertarPersona(p.getLigaLista().getLiga(),persona,cedula);
-                    }
-                    p=p.getLiga();
+    public void insertarPersona(Nodo p, Persona persona, Integer cedula) {
+        if (ancestro == null) {
+            ancestro = new Nodo(persona, null);
+        } else {
+            if (existe(persona.getCedula())) {
+                System.out.println("Ya existe una persona con esa cedula");
+            } else {
+                Boolean sw = insertar(p, persona, cedula);
+                if (sw == false) {
+                    System.out.println("No existe el padre buscado");
                 }
             }
-            if(sw==false){
-                System.out.println("No existe el padre buscado");
-            }else{
-                Nodo dato = new Nodo(persona, null);
-
+        }
+}
+    
+    private Boolean insertar(Nodo p, Persona persona, Integer cedula) {
+        Boolean sw = false;
+        Boolean swL = false;
+        while (p != null && sw == false && swL == false) {
+            if (p.getCedula().equals(cedula)) {
+                swL = true;
+            } else {
                 if (p.getSw() == 1) {
-
-                    Nodo ant = p.getLigaLista();
-                    Nodo x = ant.getLiga();
-
+                    sw = insertar(p.getLigaLista().getLiga(), persona, cedula);
+                }
+                p = p.getLiga();
+            }
+        }
+        if (swL == true) {
+            Nodo dato = new Nodo(persona, null);
+            if (p.getSw() == 1) {
+                Nodo ant = p.getLigaLista();
+                Nodo x = ant.getLiga();
+                while (x != null && x.getCedula() < persona.getCedula()) {
+                    ant = x;
+                    x = x.getLiga();
+                }
+                dato.setLiga(x);
+                ant.setLiga(dato);
+            } else {
+                if (p == ancestro) {
+                    Nodo ant = p;
+                    Nodo x = p.getLiga();
                     while (x != null && x.getCedula() < persona.getCedula()) {
                         ant = x;
                         x = x.getLiga();
                     }
-
                     dato.setLiga(x);
                     ant.setLiga(dato);
-
                 } else {
-                    if (p == ancestro){
-                        Nodo ant=p;
-                        Nodo x = p.getLiga();
-                        while (x != null && x.getCedula() < persona.getCedula()) {
-                            ant = x;
-                            x = x.getLiga();
-                        }
-                        
-                        dato.setLiga(x);
-                        ant.setLiga(dato);
-                    }else{
-                        Nodo primogenito = new Nodo(p.getPersona(), dato);
-                        p.setLigaLista(primogenito);
-                        p.setSw(1);
-                        p.setPersona(null);
-                    }
-             
+                    Nodo primogenito = new Nodo(p.getPersona(), dato);
+                    p.setLigaLista(primogenito);
+                    p.setSw(1);
+                    p.setPersona(null);
                 }
+            }
+            sw = true;
         }
+        return sw;
     }
-        
+
      
 
 
-    }
+    
     
     public void mostrarTodo(Nodo p){
         while (p!= null){
@@ -127,7 +129,14 @@ public class Lista {
       
     }
     public void mostrarNivelCed(Nodo p, Integer ced) {
-        int nivel = mostrarNivelCed(p, ced, 1);
+        int nivel = 0;
+        if (p != null) {
+            if (p.getCedula().equals(ced)) {
+                nivel = 1;
+            } else {
+                nivel = mostrarNivelCed(p.getLiga(), ced, 2);
+            }
+        }
         if (nivel == 0) {
             System.out.println("No existe la persona con cedula " + ced);
         } else {
@@ -136,65 +145,56 @@ public class Lista {
     }
 
     public int mostrarNivelCed(Nodo p, Integer ced, Integer nivel) {
-
-        while (p != null) {
-
+        int res = 0;
+        while (p != null && res == 0) {
             if (p.getCedula().equals(ced)) {
-                if (nivel == 0 && p != ancestro) {
-                    return 1;
-                }else{
-                    if(p==ancestro){
-                        return 0;
-                    }
-                     return nivel+1;
-                }
-               
+                res = nivel;
             } else {
                 if (p.getSw() == 1) {
-                    int r = mostrarNivelCed(p.getLigaLista().getLiga(), ced, nivel + 1);
-                    if (r != -1) {
-                        return r;
-                    }
+                    res = mostrarNivelCed(p.getLigaLista().getLiga(), ced, nivel + 1);
                 }
                 p = p.getLiga();
             }
         }
-
-        return -1;
+        return res;
     }
     
     public void mostrarInfoGen(Nodo p, Integer ced) {
-        Boolean sw = mostrarInfoGen(p, ced,false);
-        if (sw == false) {
-            System.out.println("No existe la persona con cedula " + ced);
+        if (p == null || p.getCedula().equals(ced)) {
+            System.out.println("No tiene hermanos");
         } else {
-            System.out.println("Nivel dato: " + sw);
+            Boolean sw = mostrarInfoGen(p, ced, false);
+            if (sw == false) {
+                System.out.println("No existe la persona con cedula " + ced);
+            }
         }
     }
 
-    public Boolean  mostrarInfoGen(Nodo p, Integer ced, Boolean sw) {
-        Nodo q  = p;
-        Boolean swL =false;
-        while (q != null && swL==false && sw == false) {
+    public Boolean mostrarInfoGen(Nodo padre, Integer ced, Boolean sw) {
+        Nodo q = padre.getLiga();
+        Boolean swL = false;
+        while (q != null && swL == false && sw == false) {
             if (q.getCedula().equals(ced)) {
-                 sw=true;
-                 swL=true;
+                swL = true;
             } else {
                 if (q.getSw() == 1) {
-                     mostrarInfoGen(q.getLigaLista().getLiga(), ced,sw);
+                    sw = mostrarInfoGen(q.getLigaLista(), ced, sw);
                 }
                 q = q.getLiga();
             }
         }
-        if(swL==true){
-            System.out.println("Hermanos de de tamas " + ced);
-            while(p!=null){
-                System.out.println(p.getPersona().toString());
-                p=p.getLiga();
+        if (swL == true) {
+            sw = true;
+            System.out.println("Hermanos de " + ced + ":");
+            Nodo h = padre.getLiga();
+            while (h != null) {
+                if (!h.getCedula().equals(ced)) {
+                    System.out.println(h.getPersona().toString());
+                }
+                h = h.getLiga();
             }
         }
-
-      return sw;
+        return sw;
     }
     
     public void mostrarInfoNiv(Nodo p, int nivelBus) {
@@ -271,9 +271,6 @@ public class Lista {
 
         return max;
     }
-    
-
-    
     
     
     
@@ -358,14 +355,13 @@ public class Lista {
             System.out.println("No existe el nivel " + nivelBus);
         }
         }
-    private void eliminarLista(Nodo x, Nodo cab) {
+    private void eliminarLista(Nodo x, Nodo padre) {
         if (x != null) {
-            eliminarLista(x.getLiga(), cab); 
-
-          
-            eliminar(x, cab);
-            if (x.getSw() == 1) {
-                ordenar(x, cab);   
+            eliminarLista(x.getLiga(), padre);
+            Boolean teniaSublista = x.getSw() == 1;
+            eliminar(x, padre);
+            if (teniaSublista == true) {
+                ordenar(x, padre);
             }
         }
     }
@@ -398,4 +394,156 @@ public class Lista {
 
         return sw;
     }
+    
+    
+    
+    private Boolean existe(Integer ced) {
+        return ancestro.getCedula().equals(ced) || esDescendiente(ancestro, ced);
+    }
+
+    private Boolean esDescendiente(Nodo padre, Integer ced) {
+        Boolean sw = false;
+        Nodo q = padre.getLiga();
+        while (q != null && sw == false) {
+            if (q.getCedula().equals(ced)) {
+                sw = true;
+            } else {
+                if (q.getSw() == 1) {
+                    sw = esDescendiente(q.getLigaLista(), ced);
+                }
+            }
+            q = q.getLiga();
+        }
+        return sw;
+    }
+
+    public void ancestroComun(Integer a, Integer b) {
+        if (ancestro == null) {
+            System.out.println("Arbol vacio");
+        } else if (a.equals(b)) {
+            System.out.println("Las cedulas deben ser distintas");
+        } else if (!existe(a) || !existe(b)) {
+            System.out.println("Alguna de las personas no existe");
+        } else if (ancestro.getCedula().equals(a) || ancestro.getCedula().equals(b)) {
+            System.out.println("La raiz no tiene ascendientes, no hay ancestro comun");
+        } else {
+            Nodo padreComun = ancestroComun(ancestro, a, b);
+            System.out.println("Ancestro comun mas cercano: " + padreComun.getPersona().toString());
+        }
+    }
+
+    private Nodo ancestroComun(Nodo padre, Integer a, Integer b) {
+        Nodo res = padre;
+        Boolean sw = false;
+        Nodo q = padre.getLiga();
+        while (q != null && sw == false) {
+            if (q.getSw() == 1) {
+                Nodo sub = q.getLigaLista();
+                if (esDescendiente(sub, a) && esDescendiente(sub, b)) {
+                    res = ancestroComun(sub, a, b);
+                    sw = true;
+                }
+            }
+            q = q.getLiga();
+        }
+        return res;
+    }
+    private Nodo buscarPadre(Nodo padre, Integer ced) {
+    Nodo res = null;
+    Nodo q = padre.getLiga();
+    while (q != null && res == null) {
+        if (q.getCedula().equals(ced)) {
+            res = padre;
+        } else {
+            if (q.getSw() == 1) {
+                res = buscarPadre(q.getLigaLista(), ced);
+            }
+        }
+        q = q.getLiga();
+    }
+    return res;
+}
+
+private Nodo buscarEnLista(Nodo padre, Integer ced) {
+    Nodo q = padre.getLiga();
+    while (q != null && !q.getCedula().equals(ced)) {
+        q = q.getLiga();
+    }
+    return q;
+}
+
+public void trasladarRama(Integer a, Integer b) {
+    if (ancestro == null) {
+        System.out.println("Arbol vacio");
+    } else {
+        if (a.equals(b) || !existe(a) || !existe(b)) {
+            System.out.println("Cedulas invalidas");
+        } else {
+            if (ancestro.getCedula().equals(a)) {
+                System.out.println("No se puede trasladar la raiz");
+            } else {
+                Nodo cabPadreA = buscarPadre(ancestro, a);
+                Nodo nodoA = buscarEnLista(cabPadreA, a);
+
+                if (nodoA.getSw() == 1 && esDescendiente(nodoA.getLigaLista(), b)) {
+                    System.out.println("B es descendiente de A, no se puede");
+                } else {
+                    if (cabPadreA.getCedula().equals(b)) {
+                        System.out.println("B ya es el padre de A");
+                    } else {
+                        moverRama(nodoA, cabPadreA, b);
+                        System.out.println("Rama trasladada");
+                    }
+                }
+            }
+        }
+    }
+}
+
+private void moverRama(Nodo nodoA, Nodo cabPadreA, Integer b) {
+
+    Nodo ant = cabPadreA;
+    while (ant.getLiga() != nodoA) {
+        ant = ant.getLiga();
+    }
+    ant.setLiga(nodoA.getLiga());
+    nodoA.setLiga(null);
+
+    
+    if (cabPadreA.getLiga() == null && cabPadreA != ancestro) {
+        Nodo cabAbuelo = buscarPadre(ancestro, cabPadreA.getCedula());
+        Nodo nodoPadre = buscarEnLista(cabAbuelo, cabPadreA.getCedula());
+        nodoPadre.setPersona(cabPadreA.getPersona());
+        nodoPadre.setLigaLista(null);
+        nodoPadre.setSw(0);
+    }
+
+  
+    Nodo cabB;
+    if (ancestro.getCedula().equals(b)) {
+        cabB = ancestro;
+    } else {
+        Nodo cabPadreB = buscarPadre(ancestro, b);
+        Nodo nodoB = buscarEnLista(cabPadreB, b);
+        if (nodoB.getSw() == 1) {
+            cabB = nodoB.getLigaLista();
+        } else {
+            cabB = new Nodo(nodoB.getPersona(), null);  
+            nodoB.setLigaLista(cabB);
+            nodoB.setSw(1);
+            nodoB.setPersona(null);
+        }
+    }
+
+  
+    ant = cabB;
+    Nodo q = cabB.getLiga();
+    while (q != null && q.getCedula() > nodoA.getCedula()) {
+        ant = q;
+        q = q.getLiga();
+    }
+    nodoA.setLiga(q);
+    ant.setLiga(nodoA);
+}
+    
 }
