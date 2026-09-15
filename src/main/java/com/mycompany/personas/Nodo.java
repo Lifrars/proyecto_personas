@@ -51,7 +51,11 @@ public class Nodo {
     }
 
     public Persona getPersona() {
-        return persona;
+        if (sw == 0) {
+            return persona;
+        } else {
+            return ligaLista.getPersona();
+       }
     }
 
     public void setPersona(Persona persona) {
@@ -64,6 +68,8 @@ public class Nodo {
         } else {
             return ligaLista.getPersona().getCedula();
        }
+        
+   
 }
     
     

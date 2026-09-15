@@ -24,7 +24,8 @@ public class Personas {
               + "2. Para insertar al final\n"
               + "3. Para mostrar\n"
               + "4. Para mostrar nivel registro \n"
-              + "6. Para insertar datos prueba\n"
+              + "5. Para mostrar generacion por hermano \n"
+              + "6. Para insertar datos pruebasn\n"
               + "5. Para salir");
 
             if (opcion == null) {
@@ -60,9 +61,15 @@ public class Personas {
                     lista.mostrarNivelCed(lista.getAncestro(), cedula);
                     break;
                 case "5":
+                    cedula = parseInt(JOptionPane.showInputDialog("Digite la cedula de la persona , para encontrar las generaciones "));
+                    lista.mostrarInfoGen(lista.getAncestro(), cedula);
                     break;
                 case "6":
                     cargarDatosPrueba(lista);
+                    break;   
+                case "7":
+                    cedula = parseInt(JOptionPane.showInputDialog("Digite el nivel , para encontrar las generaciones "));
+                    lista.mostrarInfoNiv(lista.getAncestro(), cedula);
                     break;   
                 default:
                     JOptionPane.showMessageDialog(null, "Elija una opcion entre 1 y 5");

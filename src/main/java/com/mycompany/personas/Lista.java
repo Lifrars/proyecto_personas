@@ -106,7 +106,7 @@ public class Lista {
             if (q.getCedula().equals(ced)){
                 sw= true;
                 swL= true;
-                System.out.println("Dato");
+     
             }else{
                 if(q.getSw()==1){
                    sw = mostrarInformacionPadre(q.getLigaLista(),ced,sw);
@@ -127,8 +127,8 @@ public class Lista {
       
     }
     public void mostrarNivelCed(Nodo p, Integer ced) {
-        int nivel = mostrarNivelCed(p, ced, 0);
-        if (nivel == -1) {
+        int nivel = mostrarNivelCed(p, ced, 1);
+        if (nivel == 0) {
             System.out.println("No existe la persona con cedula " + ced);
         } else {
             System.out.println("Nivel dato: " + nivel);
@@ -161,5 +161,201 @@ public class Lista {
         }
 
         return -1;
+    }
+    
+    public void mostrarInfoGen(Nodo p, Integer ced) {
+        Boolean sw = mostrarInfoGen(p, ced,false);
+        if (sw == false) {
+            System.out.println("No existe la persona con cedula " + ced);
+        } else {
+            System.out.println("Nivel dato: " + sw);
+        }
+    }
+
+    public Boolean  mostrarInfoGen(Nodo p, Integer ced, Boolean sw) {
+        Nodo q  = p;
+        Boolean swL =false;
+        while (q != null && swL==false && sw == false) {
+            if (q.getCedula().equals(ced)) {
+                 sw=true;
+                 swL=true;
+            } else {
+                if (q.getSw() == 1) {
+                     mostrarInfoGen(q.getLigaLista().getLiga(), ced,sw);
+                }
+                q = q.getLiga();
+            }
+        }
+        if(swL==true){
+            System.out.println("Hermanos de de tamas " + ced);
+            while(p!=null){
+                System.out.println(p.getPersona().toString());
+                p=p.getLiga();
+            }
+        }
+
+      return sw;
+    }
+    
+    public void mostrarInfoNiv(Nodo p, int nivelBus) {
+        Boolean sw = false;
+
+        if (p != null) {
+            if (nivelBus == 1) {
+                System.out.println(p.getPersona().toString());  
+                sw = true;
+            } else {
+                sw = mostrarInfoNiv(p.getLiga(), nivelBus, 2);  
+            }
+        }
+
+        if (sw == false) {
+            System.out.println("No existe el nivel " + nivelBus);
+        }
+    }
+
+    public Boolean mostrarInfoNiv(Nodo p, int nivelBus, int nivel) {
+
+        Boolean sw = false;
+      
+        if (p != null && nivel == nivelBus) {
+          
+            while (p != null) {
+                System.out.println(p.getPersona().toString());
+                p = p.getLiga();
+            }
+            sw = true;
+        } else {
+            while (p != null) {
+                if (p.getSw() == 1) {
+                    Boolean swR = mostrarInfoNiv(p.getLigaLista().getLiga(), nivelBus, nivel + 1);
+                    if (swR == true) {
+                        sw = true;
+                    }
+                }
+                p = p.getLiga();
+            }
+        }
+
+        return sw;
+    }
+    
+    public void mostrarMasProfundo() {
+        
+        if (ancestro == null) {
+            System.out.println("Arbol vacio");
+        } else {
+            int max = nivelMax(ancestro.getLiga(), 2);
+            System.out.println("Nivel mas profundo: " + max);
+            mostrarInfoNiv(ancestro, max);
+        }
+}
+
+    public int nivelMax(Nodo p, int nivel) {
+        if (p == null) {
+            return nivel - 1;
+        }
+
+        int max = nivel;
+        Nodo q = p;
+
+        while (q != null) {
+            if (q.getSw() == 1) {
+                int r = nivelMax(q.getLigaLista().getLiga(), nivel + 1);
+                if (r > max) {
+                    max = r;
+                }
+            }
+            q = q.getLiga();
+        }
+
+        return max;
+    }
+    
+    public void eliminarPOrNIvel(Nodo p, int nivelBus) {
+        Boolean sw = false;
+
+        if (p != null) {
+            if (nivelBus == 1) {
+                System.out.println(p.getPersona().toString());  
+                sw = true;
+            } else {
+                sw = mostrarInfoNiv(p.getLiga(), nivelBus, 2);  
+            }
+        }
+
+        if (sw == false) {
+            System.out.println("No existe el nivel " + nivelBus);
+        }
+    }
+    
+    public Boolean eliminarPorNIvel(Nodo p, int nivelBus, int nivel) {
+
+        Boolean sw = false;
+      
+        if (p != null && nivel == nivelBus) {
+          
+            while (p != null) {
+                
+                p = p.getLiga();
+            }
+            sw = true;
+        } else {
+            while (p != null) {
+                if (p.getSw() == 1) {
+                    Boolean swR = mostrarInfoNiv(p.getLigaLista().getLiga(), nivelBus, nivel + 1);
+                    if (swR == true) {
+                        sw = true;
+                    }
+                }
+                p = p.getLiga();
+            }
+        }
+
+        return sw;
+    }
+    
+    
+    public void eliminar(Nodo p, Nodo cabLista) {
+        Nodo s, q, ant;
+
+        if (p == ancestro && ancestro.getLiga() == null) {
+            ancestro = null;                      
+        } else{
+            if (p.getSw() == 0 && p != ancestro) {
+                ant = cabLista;                   
+                while (ant != null && ant.getLiga() != p) {
+                    ant = ant.getLiga();
+                }
+                if (ant != null) {
+                    ant.setLiga(p.getLiga());
+                }
+
+            } else {
+                if (p == ancestro) {
+                    s = ancestro;
+                } else {
+                    s = p.getLigaLista();
+                }
+
+                q = s.getLiga();
+
+                if (q != null) {
+                    s.setPersona(q.getPersona());
+
+                    if (q.getSw() == 1) {
+                        eliminar(q, s);
+                    } else {
+                        s.setLiga(q.getLiga());
+
+                        if (s.getLiga() == null && p != ancestro) {
+                            p.setPersona(s.getPersona());
+                            p.setLigaLista(null);
+                            p.setSw(0);
+                        }
+                    }
+                }
+            }
+        }
     }
 }
