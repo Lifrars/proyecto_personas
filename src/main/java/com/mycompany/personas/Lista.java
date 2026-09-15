@@ -272,58 +272,40 @@ public class Lista {
         return max;
     }
     
-    public void eliminarPOrNIvel(Nodo p, int nivelBus) {
-        Boolean sw = false;
 
-        if (p != null) {
-            if (nivelBus == 1) {
-                System.out.println(p.getPersona().toString());  
-                sw = true;
-            } else {
-                sw = mostrarInfoNiv(p.getLiga(), nivelBus, 2);  
-            }
-        }
-
-        if (sw == false) {
-            System.out.println("No existe el nivel " + nivelBus);
-        }
-    }
     
-    public Boolean eliminarPorNIvel(Nodo p, int nivelBus, int nivel) {
+    
+    
+    
+    public void ordenar(Nodo x, Nodo padre) {
+        Nodo ant, q;
+        ant = padre;
+        while (ant.getLiga() != x) {
+            ant = ant.getLiga();
+        }
+        ant.setLiga(x.getLiga());
 
-        Boolean sw = false;
+     
+        ant = padre;
+        q = padre.getLiga();
+        while (q != null && q.getCedula() > x.getCedula()) {
+            ant = q;
+            q = q.getLiga();
+        }
+
       
-        if (p != null && nivel == nivelBus) {
-          
-            while (p != null) {
-                
-                p = p.getLiga();
-            }
-            sw = true;
-        } else {
-            while (p != null) {
-                if (p.getSw() == 1) {
-                    Boolean swR = mostrarInfoNiv(p.getLigaLista().getLiga(), nivelBus, nivel + 1);
-                    if (swR == true) {
-                        sw = true;
-                    }
-                }
-                p = p.getLiga();
-            }
-        }
-
-        return sw;
+        x.setLiga(q);
+        ant.setLiga(x);
     }
     
-    
-    public void eliminar(Nodo p, Nodo cabLista) {
+    public void eliminar(Nodo p, Nodo padre) {
         Nodo s, q, ant;
 
         if (p == ancestro && ancestro.getLiga() == null) {
             ancestro = null;                      
         } else{
             if (p.getSw() == 0 && p != ancestro) {
-                ant = cabLista;                   
+                ant = padre;                   
                 while (ant != null && ant.getLiga() != p) {
                     ant = ant.getLiga();
                 }
@@ -345,6 +327,7 @@ public class Lista {
 
                     if (q.getSw() == 1) {
                         eliminar(q, s);
+                        ordenar(q,s);
                     } else {
                         s.setLiga(q.getLiga());
 
@@ -357,5 +340,62 @@ public class Lista {
                 }
             }
         }
+    }
+    
+    public void eliminarPorNIvel(int nivelBus) {
+        Boolean sw = false;
+
+        if (ancestro != null) {
+            if (nivelBus == 1) {
+                eliminar(ancestro,ancestro);
+                sw = true;
+            } else {
+                sw = eliminarPorNIvel(ancestro, nivelBus, 2);  
+            }
+        }
+
+        if (sw == false) {
+            System.out.println("No existe el nivel " + nivelBus);
+        }
+        }
+    private void eliminarLista(Nodo x, Nodo cab) {
+        if (x != null) {
+            eliminarLista(x.getLiga(), cab); 
+
+          
+            eliminar(x, cab);
+            if (x.getSw() == 1) {
+                ordenar(x, cab);   
+            }
+        }
+    }
+    public Boolean eliminarPorNIvel(Nodo p, int nivelBus, int nivel) {
+
+        Boolean sw = false;
+        Nodo q = p.getLiga();
+        if ( nivel == nivelBus) {
+            if (q != null) {
+                eliminarLista(q, p);
+                sw = true;
+            }
+        } else {
+            while (q != null) {
+                if (q.getSw() == 1) {
+                    Nodo padreSub=q.getLigaLista();
+                    Boolean swR = eliminarPorNIvel(padreSub, nivelBus, nivel + 1);
+                    if (swR == true) {
+                        sw = true;
+                    }
+                    if (padreSub.getLiga() == null) {
+                        q.setPersona(padreSub.getPersona());
+                        q.setLigaLista(null);
+                        q.setSw(0);
+                    }
+                }
+                q = q.getLiga();
+            }
+        }
+
+        return sw;
     }
 }
