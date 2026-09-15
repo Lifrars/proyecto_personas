@@ -24,6 +24,11 @@ public class Personas {
                 + "9. Ancestro comun mas cercano\n"
                 + "10. Trasladar rama (adopcion)\n"
                 + "11. Cargar datos de prueba\n"
+                + "12. Para mostrar todos los hijos\n"
+                + "13. Para mostrar todos los hermanos\n"
+                + "14. Para mostrar los tios\n"
+                + "15. Para mostrar los sobrinos\n"
+                + "16. Para mostrar los primos\n"
                 + "0. Salir");
 
             if (opcion == null || opcion.trim().equals("0")) {
@@ -109,6 +114,38 @@ public class Personas {
                     cargarDatosPrueba(lista);
                 }
                 break;
+                
+            case "12":
+                ced = leerEntero("Ingrese la cedula del padre para mostrar los hijos");
+                if(lista.MostrarTodosLosHijos(lista.getAncestro(), ced, true)){
+                    JOptionPane.showMessageDialog(null,"Persona no encontrada");
+                }
+                break;
+            case "13":
+                ced = leerEntero("Ingrese la cedula de el hermano para mostrar los hermanos");
+                if(lista.MostrarHermanos(lista.getAncestro(), ced, true)){
+                    JOptionPane.showMessageDialog(null,"Persona no encontrada");
+                }
+                break;   
+            case "14":
+                ced = leerEntero("Ingrese la cedula de la persona para mostrar los tios");
+                if(lista.MostrarTios(lista.getAncestro(), ced, true)){
+                    JOptionPane.showMessageDialog(null,"Persona no encontrada");
+                }
+                break;
+            case "15":
+                ced = leerEntero("Ingrese la cedula de la persona para mostrar los sobrinos");
+                if(lista.MostrarSobrinos(lista.getAncestro(), ced, true)){
+                    JOptionPane.showMessageDialog(null,"Persona no encontrada");
+                }
+                break; 
+            case "16":
+                ced = leerEntero("Ingrese la cedula de la persona para mostrar los primos");
+                if(lista.MostrarPrimos(lista.getAncestro(), ced, true)){
+                    JOptionPane.showMessageDialog(null,"Persona no encontrada");
+                }
+                break; 
+            
             default:
                 JOptionPane.showMessageDialog(null, "Elija una opcion entre 0 y 11");
         }
