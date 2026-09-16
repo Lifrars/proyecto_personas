@@ -13,23 +13,30 @@ public class Personas {
 
         while (salir == false) {
             String opcion = JOptionPane.showInputDialog(
-                  "1. Insertar persona\n"
-                + "2. Mostrar padre\n"
-                + "3. Mostrar todo\n"
-                + "4. Mostrar nivel de una persona\n"
-                + "5. Mostrar hermanos\n"
-                + "6. Mostrar personas de un nivel\n"
-                + "7. Mostrar nivel mas profundo\n"
-                + "8. Eliminar por nivel\n"
-                + "9. Ancestro comun mas cercano\n"
-                + "10. Trasladar rama (adopcion)\n"
-                + "11. Cargar datos de prueba\n"
-                + "12. Para mostrar todos los hijos\n"
-                + "13. Para mostrar todos los hermanos\n"
-                + "14. Para mostrar los tios\n"
-                + "15. Para mostrar los sobrinos\n"
-                + "16. Para mostrar los primos\n"
-                + "0. Salir");
+                    "1. Insertar persona\n"
+                    + "2. Mostrar padre\n"
+                    + "3. Mostrar todo\n"
+                    + "4. Mostrar nivel de una persona\n"
+                    + "5. Mostrar hermanos\n"
+                    + "6. Mostrar personas de un nivel\n"
+                    + "7. Mostrar nivel mas profundo\n"
+                    + "8. Eliminar por nivel\n"
+                    + "9. Ancestro comun mas cercano\n"
+                    + "10. Trasladar rama (adopcion)\n"
+                    + "11. Cargar datos de prueba\n"
+                    + "12. Para mostrar todos los hijos\n"
+                    + "13. Para mostrar todos los hermanos\n"
+                    + "14. Para mostrar los tios\n"
+                    + "15. Para mostrar los sobrinos\n"
+                    + "16. Para mostrar los primos\n"
+                    + "17. Para mostrar los Ancestros\n"
+                    + "18. Para mostrar los Descendientes\n"
+                    + "19. Visualizar arbol completo\n"
+                    + "20. Visualizar la persona con el mayor numero de hijos directos\n"
+                    + "21. Visualizar la persona con la menor edad\n"
+                    + "22. Visualizar la cantidad de generaciones\n"
+                    + "23. Actualizar Persona\n"
+                    + "0. Salir");
 
             if (opcion == null || opcion.trim().equals("0")) {
                 salir = true;
@@ -114,45 +121,119 @@ public class Personas {
                     cargarDatosPrueba(lista);
                 }
                 break;
-                
+
             case "12":
                 ced = leerEntero("Ingrese la cedula del padre para mostrar los hijos");
-                if(lista.MostrarTodosLosHijos(lista.getAncestro(), ced, true)){
-                    JOptionPane.showMessageDialog(null,"Persona no encontrada");
+                if (lista.MostrarTodosLosHijos(lista.getAncestro(), ced, true)) {
+                    JOptionPane.showMessageDialog(null, "Persona no encontrada");
                 }
                 break;
             case "13":
                 ced = leerEntero("Ingrese la cedula de el hermano para mostrar los hermanos");
-                if(lista.MostrarHermanos(lista.getAncestro(), ced, true)){
-                    JOptionPane.showMessageDialog(null,"Persona no encontrada");
+                if (lista.MostrarHermanos(lista.getAncestro(), ced, true)) {
+                    JOptionPane.showMessageDialog(null, "Persona no encontrada");
                 }
-                break;   
+                break;
             case "14":
                 ced = leerEntero("Ingrese la cedula de la persona para mostrar los tios");
-                if(lista.MostrarTios(lista.getAncestro(), ced, true)){
-                    JOptionPane.showMessageDialog(null,"Persona no encontrada");
+                if (lista.MostrarTios(lista.getAncestro(), ced, true)) {
+                    JOptionPane.showMessageDialog(null, "Persona no encontrada");
                 }
                 break;
             case "15":
                 ced = leerEntero("Ingrese la cedula de la persona para mostrar los sobrinos");
-                if(lista.MostrarSobrinos(lista.getAncestro(), ced, true)){
-                    JOptionPane.showMessageDialog(null,"Persona no encontrada");
+                if (lista.MostrarSobrinos(lista.getAncestro(), ced, true)) {
+                    JOptionPane.showMessageDialog(null, "Persona no encontrada");
                 }
-                break; 
+                break;
             case "16":
                 ced = leerEntero("Ingrese la cedula de la persona para mostrar los primos");
-                if(lista.MostrarPrimos(lista.getAncestro(), ced, true)){
-                    JOptionPane.showMessageDialog(null,"Persona no encontrada");
+                if (lista.MostrarPrimos(lista.getAncestro(), ced, true)) {
+                    JOptionPane.showMessageDialog(null, "Persona no encontrada");
                 }
-                break; 
-            
+                break;
+            case "17":
+                ced = leerEntero("Ingrese la cedula de la persona para mostrar los Ancestros");
+                if (lista.MostrarAncestros(lista.getAncestro(), ced, true)) {
+                    JOptionPane.showMessageDialog(null, "Persona no encontrada");
+                }
+                break;
+            case "18":
+                ced = leerEntero("Ingrese la cedula de la persona para mostrar los Descendientes");
+                if (lista.MostrarDescendientes(lista.getAncestro(), ced, true)) {
+                    JOptionPane.showMessageDialog(null, "Persona no encontrada");
+                }
+                break;
+            case "19":
+                lista.visualizarArbol();
+                break;
+            case "20":
+                lista.mostrarNodoMayorGrado();
+                break;
+            case "21":
+                lista.mostrarFamiliarMasJoven();
+                break;
+            case "22":
+                lista.mostrarAlturaArbol();
+                break;
+            case "23":
+                actualizarPersona(lista);
+                break;
+
             default:
                 JOptionPane.showMessageDialog(null, "Elija una opcion entre 0 y 11");
         }
     }
 
-    // ---------- LECTURA DE DATOS ----------
+    private static void actualizarPersona(Lista lista) {
+        if (lista.getAncestro() == null) {
+            JOptionPane.showMessageDialog(null, "Arbol vacio");
+            return;
+        }
 
+        Integer cedVieja = leerEntero("Cedula de la persona a actualizar:");
+        if (cedVieja == null) {
+            return;
+        }
+        if (!lista.existeCedula(cedVieja)) {
+            JOptionPane.showMessageDialog(null, "No existe una persona con esa cedula");
+            return;
+        }
+
+        String nuevoNombre = JOptionPane.showInputDialog("Nuevo nombre:");
+        if (nuevoNombre == null || nuevoNombre.trim().isEmpty()) {
+            return;
+        }
+
+        Integer cedNueva = leerEntero("Nueva cedula:");
+        if (cedNueva == null) {
+            return;
+        }
+        if (cedNueva <= 0) {
+            JOptionPane.showMessageDialog(null, "La cedula debe ser positiva");
+            return;
+        }
+
+        String fechaStr = JOptionPane.showInputDialog("Nueva fecha de nacimiento (dd/MM/yyyy):");
+        if (fechaStr == null) {
+            return;
+        }
+
+        try {
+            SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
+            formato.setLenient(false);
+            Date nuevaFecha = formato.parse(fechaStr.trim());
+            if (nuevaFecha.after(new Date())) {
+                JOptionPane.showMessageDialog(null, "La fecha no puede ser futura");
+            } else {
+                lista.actualizarPersona(cedVieja, nuevoNombre.trim(), cedNueva, nuevaFecha);
+            }
+        } catch (ParseException e) {
+            JOptionPane.showMessageDialog(null, "Fecha invalida. Use dd/MM/yyyy");
+        }
+    }
+
+    // ---------- LECTURA DE DATOS ----------
     // Devuelve null si cancela o si no escribe un numero
     private static Integer leerEntero(String mensaje) {
         Integer num = null;
@@ -228,7 +309,6 @@ public class Personas {
     }
 
     // ---------- DATOS DE PRUEBA ----------
-
     private static Persona nuevaPersona(String nombre, int cedula, String fecha) {
         Persona persona = null;
         try {

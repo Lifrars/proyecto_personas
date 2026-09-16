@@ -4,6 +4,12 @@
  */
 package com.mycompany.personas;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Deque;
+import java.util.List;
 import javax.swing.JOptionPane;
 
 /**
@@ -699,7 +705,7 @@ public class Lista {
                 }
             } else {
                 if (q.getSw() == 1) {
-                    sw = MostrarSobrinos(q.getLigaLista(),cedpersona,sw);
+                    sw = MostrarSobrinos(q.getLigaLista(), cedpersona, sw);
                 }
                 q = q.getLiga();
             }
@@ -724,12 +730,336 @@ public class Lista {
                 }
             } else {
                 if (q.getSw() == 1) {
-                    sw = MostrarPrimos(q.getLigaLista(),cedpersona,sw);
+                    sw = MostrarPrimos(q.getLigaLista(), cedpersona, sw);
                 }
                 q = q.getLiga();
             }
         }
         return sw;
+    }
+
+    public boolean MostrarAncestros(Nodo p, int cedpersona, boolean sw) {
+        Nodo q = p;
+
+        while (q != null && sw) {
+            if (cedpersona == q.getCedula()) {
+                sw = false;
+
+                if (q == ancestro) {
+                    JOptionPane.showMessageDialog(null, "La persona es el ancestro, no tiene ancestros registrados");
+                } else {
+                    Nodo padre = buscarPadre(ancestro, cedpersona);
+                    System.out.println("Ancestros:");
+
+                    while (padre != null) {
+                        System.out.println(padre.getPersona().toString());
+
+                        if (padre == ancestro) {
+                            padre = null;
+                        } else {
+                            padre = buscarPadre(ancestro, padre.getCedula());
+                        }
+                    }
+                }
+            } else {
+                if (q.getSw() == 1) {
+                    sw = MostrarAncestros(q.getLigaLista(), cedpersona, sw);
+                }
+
+                q = q.getLiga();
+            }
+        }
+        return sw;
+    }
+
+    public boolean MostrarDescendientes(Nodo p, int cedpersona, boolean sw) {
+        Nodo q = p;
+
+        while (q != null && sw) {
+            if (cedpersona == q.getCedula()) {
+                sw = false;
+
+                Nodo primerHijo;
+                if (q == ancestro) {
+                    primerHijo = ancestro.getLiga();
+                } else if (q.getSw() == 1) {
+                    primerHijo = q.getLigaLista().getLiga();
+                } else {
+                    primerHijo = null;
+                }
+
+                if (primerHijo == null) {
+                    JOptionPane.showMessageDialog(null, "La persona no tiene descendientes");
+                } else {
+                    System.out.println("Descendientes:");
+
+                    Deque<Nodo> pila = new ArrayDeque<>();
+                    pila.push(primerHijo);
+
+                    while (!pila.isEmpty()) {
+                        Nodo actual = pila.pop();
+                        while (actual != null) {
+                            System.out.println(actual.getPersona().toString());
+                            if (actual.getSw() == 1) {
+                                pila.push(actual.getLiga());
+                                actual = actual.getLigaLista().getLiga();
+                            } else {
+                                actual = actual.getLiga();
+                            }
+                        }
+                    }
+                }
+            } else {
+                if (q.getSw() == 1) {
+                    sw = MostrarDescendientes(q.getLigaLista(), cedpersona, sw);
+                }
+                q = q.getLiga();
+            }
+        }
+        return sw;
+    }
+
+    public void visualizarArbol() {
+        if (ancestro == null) {
+            System.out.println("Arbol vacio");
+            return;
+        }
+
+        SimpleDateFormat f = new SimpleDateFormat("dd/MM/yyyy");
+
+        System.out.println("========== ARBOL GENEALOGICO ==========");
+        System.out.println(ancestro.getPersona().getNombre() + " (C.C. "
+                + ancestro.getCedula() + ", "
+                + f.format(ancestro.getPersona().getFecha_nacimiento()) + ")");
+
+        Deque<Object[]> pila = new ArrayDeque<>();
+
+        List<Nodo> hijosRaiz = new ArrayList<>();
+        Nodo h = ancestro.getLiga();
+        while (h != null) {
+            hijosRaiz.add(h);
+            h = h.getLiga();
+        }
+        for (int i = hijosRaiz.size() - 1; i >= 0; i--) {
+            pila.push(new Object[]{hijosRaiz.get(i), "", i == hijosRaiz.size() - 1});
+        }
+
+        while (!pila.isEmpty()) {
+            Object[] actual = pila.pop();
+            Nodo p = (Nodo) actual[0];
+            String prefijo = (String) actual[1];
+            boolean esUltimo = (boolean) actual[2];
+
+            System.out.println(prefijo + (esUltimo ? "`-- " : "|-- ")
+                    + p.getPersona().getNombre() + " (C.C. " + p.getCedula() + ", "
+                    + f.format(p.getPersona().getFecha_nacimiento()) + ")");
+
+            String nuevoPrefijo = prefijo + (esUltimo ? "    " : "|   ");
+
+            if (p.getSw() == 1) {
+                List<Nodo> hijos = new ArrayList<>();
+                Nodo hijo = p.getLigaLista().getLiga();
+                while (hijo != null) {
+                    hijos.add(hijo);
+                    hijo = hijo.getLiga();
+                }
+                for (int i = hijos.size() - 1; i >= 0; i--) {
+                    pila.push(new Object[]{hijos.get(i), nuevoPrefijo, i == hijos.size() - 1});
+                }
+            }
+        }
+
+        System.out.println("========================================");
+    }
+
+    public void mostrarNodoMayorGrado() {
+        if (ancestro == null) {
+            System.out.println("Arbol vacio");
+            return;
+        }
+
+        int mejorCantidad = 0;
+        Nodo h = ancestro.getLiga();
+        while (h != null) {
+            mejorCantidad++;
+            h = h.getLiga();
+        }
+        Nodo mejor = ancestro;
+
+        Deque<Nodo> pila = new ArrayDeque<>();
+        Nodo primero = ancestro.getLiga();
+        if (primero != null) {
+            pila.push(primero);
+        }
+
+        while (!pila.isEmpty()) {
+            Nodo actual = pila.pop();
+
+            while (actual != null) {
+                if (actual.getSw() == 1) {
+                    Nodo primerHijo = actual.getLigaLista().getLiga();
+
+                    int cantidad = 0;
+                    Nodo x = primerHijo;
+                    while (x != null) {
+                        cantidad++;
+                        x = x.getLiga();
+                    }
+
+                    if (cantidad > mejorCantidad) {
+                        mejorCantidad = cantidad;
+                        mejor = actual;
+                    }
+
+                    Nodo hermano = actual.getLiga();
+                    if (hermano != null) {
+                        pila.push(hermano);
+                    }
+                    actual = primerHijo;
+                } else {
+                    actual = actual.getLiga();
+                }
+            }
+        }
+
+        System.out.println("Persona con mayor numero de hijos directos (" + mejorCantidad + "):");
+        System.out.println(mejor.getPersona().toString());
+    }
+
+    public void mostrarFamiliarMasJoven() {
+        if (ancestro == null) {
+            System.out.println("Arbol vacio");
+            return;
+        }
+
+        Nodo masJoven = ancestro;
+
+        Deque<Nodo> pila = new ArrayDeque<>();
+        Nodo primero = ancestro.getLiga();
+        if (primero != null) {
+            pila.push(primero);
+        }
+
+        while (!pila.isEmpty()) {
+            Nodo actual = pila.pop();
+
+            while (actual != null) {
+                if (actual.getPersona().getFecha_nacimiento().after(masJoven.getPersona().getFecha_nacimiento())) {
+                    masJoven = actual;
+                }
+
+                if (actual.getSw() == 1) {
+                    Nodo primerHijo = actual.getLigaLista().getLiga();
+                    Nodo hermano = actual.getLiga();
+                    if (hermano != null) {
+                        pila.push(hermano);
+                    }
+                    actual = primerHijo;
+                } else {
+                    actual = actual.getLiga();
+                }
+            }
+        }
+
+        System.out.println("Familiar mas joven:");
+        System.out.println(masJoven.getPersona().toString());
+    }
+
+    public void mostrarAlturaArbol() {
+        if (ancestro == null) {
+            System.out.println("Arbol vacio");
+            return;
+        }
+
+        int alturaMax = 1;
+
+        Deque<Object[]> pila = new ArrayDeque<>();
+        Nodo primero = ancestro.getLiga();
+        if (primero != null) {
+            pila.push(new Object[]{primero, 2});
+        }
+
+        while (!pila.isEmpty()) {
+            Object[] datos = pila.pop();
+            Nodo actual = (Nodo) datos[0];
+            int nivel = (int) datos[1];
+
+            while (actual != null) {
+                if (nivel > alturaMax) {
+                    alturaMax = nivel;
+                }
+
+                if (actual.getSw() == 1) {
+                    Nodo primerHijo = actual.getLigaLista().getLiga();
+                    Nodo hermano = actual.getLiga();
+                    if (hermano != null) {
+                        pila.push(new Object[]{hermano, nivel});
+                    }
+                    actual = primerHijo;
+                    nivel = nivel + 1;
+                } else {
+                    actual = actual.getLiga();
+                }
+            }
+        }
+
+        System.out.println("Altura del arbol (cantidad de generaciones): " + alturaMax);
+    }
+
+    public void actualizarPersona(Integer cedulaVieja, String nuevoNombre, Integer cedulaNueva, Date nuevaFecha) {
+        if (ancestro == null) {
+            System.out.println("Arbol vacio");
+            return;
+        }
+        if (!existe(cedulaVieja)) {
+            System.out.println("No existe una persona con esa cedula");
+            return;
+        }
+        if (!cedulaVieja.equals(cedulaNueva) && existe(cedulaNueva)) {
+            System.out.println("Ya existe otra persona con la nueva cedula");
+            return;
+        }
+
+        Nodo padre = null;
+        Nodo nodo;
+        if (ancestro.getCedula().equals(cedulaVieja)) {
+            nodo = ancestro;
+        } else {
+            padre = buscarPadre(ancestro, cedulaVieja);
+            nodo = buscarEnLista(padre, cedulaVieja);
+        }
+
+        Persona persona = nodo.getPersona();
+        persona.setNombre(nuevoNombre);
+        persona.setFecha_nacimiento(nuevaFecha);
+
+        if (!cedulaVieja.equals(cedulaNueva)) {
+            persona.setCedula(cedulaNueva);
+
+            if (padre != null) {
+                Nodo ant = padre;
+                while (ant.getLiga() != nodo) {
+                    ant = ant.getLiga();
+                }
+                ant.setLiga(nodo.getLiga());
+
+                ant = padre;
+                Nodo q = padre.getLiga();
+                while (q != null && q.getCedula() < nodo.getCedula()) {
+                    ant = q;
+                    q = q.getLiga();
+                }
+                nodo.setLiga(q);
+                ant.setLiga(nodo);
+            }
+        }
+
+        System.out.println("Persona actualizada correctamente:");
+        System.out.println(persona.toString());
+    }
+
+    public Boolean existeCedula(Integer ced) {
+        return ancestro != null && existe(ced);
     }
 
     public boolean MostrarSobrinosDelPadre(Nodo p, int cedPadre, boolean sw) {
@@ -740,7 +1070,7 @@ public class Lista {
                 int count = 0;
                 Nodo tio = p.getLiga();
                 while (tio != null) {
-                    if (tio.getCedula() != cedPadre&& tio.getSw() == 1) {
+                    if (tio.getCedula() != cedPadre && tio.getSw() == 1) {
                         Nodo primo = tio.getLigaLista().getLiga();
                         while (primo != null) {
                             if (count == 0) {
@@ -754,11 +1084,11 @@ public class Lista {
                     tio = tio.getLiga();
                 }
                 if (count == 0) {
-                    JOptionPane.showMessageDialog(null,"La persona no tiene primos");
+                    JOptionPane.showMessageDialog(null, "La persona no tiene primos");
                 }
             } else {
                 if (q.getSw() == 1) {
-                    sw = MostrarSobrinosDelPadre(q.getLigaLista(),cedPadre,sw);
+                    sw = MostrarSobrinosDelPadre(q.getLigaLista(), cedPadre, sw);
                 }
                 q = q.getLiga();
             }
