@@ -20,18 +20,23 @@ public class Lista {
 
     private Nodo ancestro;
 
+    // Inicializa el arbol sin un ancestro registrado.
     public Lista() {
         ancestro = null;
     }
 
+    // Retorna la raiz que da acceso a toda la lista generalizada.
     public Nodo getAncestro() {
         return ancestro;
     }
 
+    // Reemplaza la referencia a la raiz del arbol genealogico.
     public void setAncestro(Nodo ancestro) {
         this.ancestro = ancestro;
     }
 
+    // La primera persona se convierte en ancestro; las demas se insertan
+    // como hijos del padre indicado, siempre que su cedula no este repetida.
     public void insertarPersona(Nodo p, Persona persona, Integer cedula) {
         if (ancestro == null) {
             ancestro = new Nodo(persona, null);
@@ -47,6 +52,9 @@ public class Lista {
         }
     }
 
+    // Recorre recursivamente las listas de hermanos hasta localizar al padre.
+    // Inserta el nuevo hijo por cedula de menor a mayor y convierte al padre en
+    // sublista cuando recibe su primer descendiente.
     private Boolean insertar(Nodo p, Persona persona, Integer cedula) {
         Boolean sw = false;
         Boolean swL = false;
@@ -55,6 +63,8 @@ public class Lista {
                 swL = true;
             } else {
                 if (p.getSw() == 1) {
+                    // Se omite la cabecera de la sublista porque representa al padre;
+                    // la busqueda debe continuar desde su primer hijo.
                     sw = insertar(p.getLigaLista().getLiga(), persona, cedula);
                 }
                 p = p.getLiga();
@@ -63,6 +73,8 @@ public class Lista {
         if (swL == true) {
             Nodo dato = new Nodo(persona, null);
             if (p.getSw() == 1) {
+                // Si el padre ya tiene hijos, su nodo apunta a una sublista cuya
+                // cabecera es el propio padre y cuya liga inicia la lista de hijos.
                 Nodo ant = p.getLigaLista();
                 Nodo x = ant.getLiga();
                 while (x != null && x.getCedula() < persona.getCedula()) {
@@ -82,6 +94,8 @@ public class Lista {
                     dato.setLiga(x);
                     ant.setLiga(dato);
                 } else {
+                    // Una hoja se transforma en nodo de sublista al recibir su
+                    // primer hijo; la persona pasa a la nueva cabecera.
                     Nodo primogenito = new Nodo(p.getPersona(), dato);
                     p.setLigaLista(primogenito);
                     p.setSw(1);
@@ -93,6 +107,7 @@ public class Lista {
         return sw;
     }
 
+    // Recorre en profundidad la lista generalizada e imprime cada persona.
     public void mostrarTodo(Nodo p) {
         while (p != null) {
             if (p.getSw() == 1) {
@@ -104,6 +119,8 @@ public class Lista {
         }
     }
 
+    // Busca la cedula en profundidad. La cabecera p de la lista donde se
+    // encuentra el dato representa a su padre.
     public Boolean mostrarInformacionPadre(Nodo p, Integer ced, Boolean sw) {
         Nodo q = p;
         Boolean swL = false;
@@ -131,6 +148,7 @@ public class Lista {
 
     }
 
+    // Inicia la busqueda del nivel, considerando al ancestro en el nivel 1.
     public void mostrarNivelCed(Nodo p, Integer ced) {
         int nivel = 0;
         if (p != null) {
@@ -147,6 +165,8 @@ public class Lista {
         }
     }
 
+    // Recorre hermanos y sublistas; devuelve cero si la cedula no aparece
+    // o el nivel acumulado cuando encuentra a la persona.
     public int mostrarNivelCed(Nodo p, Integer ced, Integer nivel) {
         int res = 0;
         while (p != null && res == 0) {
@@ -154,6 +174,8 @@ public class Lista {
                 res = nivel;
             } else {
                 if (p.getSw() == 1) {
+                    // Cada llamada recursiva aumenta el nivel porque entra a la
+                    // lista de hijos de la persona actual.
                     res = mostrarNivelCed(p.getLigaLista().getLiga(), ced, nivel + 1);
                 }
                 p = p.getLiga();
@@ -162,6 +184,7 @@ public class Lista {
         return res;
     }
 
+    // Valida el caso del ancestro e inicia la busqueda de los hermanos.
     public void mostrarInfoGen(Nodo p, Integer ced) {
         if (p == null || p.getCedula().equals(ced)) {
             System.out.println("No tiene hermanos");
@@ -173,6 +196,8 @@ public class Lista {
         }
     }
 
+    // Localiza a la persona y, desde la cabecera de su lista familiar,
+    // imprime todos los hijos del mismo padre excepto la cedula consultada.
     public Boolean mostrarInfoGen(Nodo padre, Integer ced, Boolean sw) {
         Nodo q = padre.getLiga();
         Boolean swL = false;
@@ -200,6 +225,7 @@ public class Lista {
         return sw;
     }
 
+    // Inicia en el nivel 1 y controla el mensaje cuando el nivel no existe.
     public void mostrarInfoNiv(Nodo p, int nivelBus) {
         Boolean sw = false;
 
@@ -217,12 +243,15 @@ public class Lista {
         }
     }
 
+    // Recorre todas las ramas hasta alcanzar la generacion solicitada.
+    // Al llegar a ella imprime la lista completa de hermanos de esa rama.
     public Boolean mostrarInfoNiv(Nodo p, int nivelBus, int nivel) {
-
         Boolean sw = false;
 
         if (p != null && nivel == nivelBus) {
 
+            // Todos los nodos enlazados por liga en este punto son hermanos y,
+            // por tanto, pertenecen al mismo nivel.
             while (p != null) {
                 System.out.println(p.getPersona().toString());
                 p = p.getLiga();
@@ -231,6 +260,8 @@ public class Lista {
         } else {
             while (p != null) {
                 if (p.getSw() == 1) {
+                    // Se explora cada sublista porque el nivel puede aparecer en
+                    // varias ramas distintas del arbol.
                     Boolean swR = mostrarInfoNiv(p.getLigaLista().getLiga(), nivelBus, nivel + 1);
                     if (swR == true) {
                         sw = true;
@@ -243,8 +274,8 @@ public class Lista {
         return sw;
     }
 
+    // Calcula la maxima profundidad y muestra las personas ubicadas alli.
     public void mostrarMasProfundo() {
-
         if (ancestro == null) {
             System.out.println("Arbol vacio");
         } else {
@@ -254,6 +285,7 @@ public class Lista {
         }
     }
 
+    // Obtiene recursivamente el mayor nivel alcanzado por cualquier rama.
     public int nivelMax(Nodo p, int nivel) {
         if (p == null) {
             return nivel - 1;
@@ -275,6 +307,8 @@ public class Lista {
         return max;
     }
 
+    // Desenlaza x de la lista de hijos y lo vuelve a insertar de menor a mayor
+    // segun su cedula.
     public void ordenar(Nodo x, Nodo padre) {
         Nodo ant, q;
         ant = padre;
@@ -285,7 +319,7 @@ public class Lista {
 
         ant = padre;
         q = padre.getLiga();
-        while (q != null && q.getCedula() > x.getCedula()) {
+        while (q != null && q.getCedula() < x.getCedula()) {
             ant = q;
             q = q.getLiga();
         }
@@ -294,6 +328,39 @@ public class Lista {
         ant.setLiga(x);
     }
 
+    // Coloca al hijo de mayor edad al inicio de la lista para que pueda ocupar
+    // el lugar del padre sin relacionar la edad con el orden de las cedulas.
+    private void colocarHijoMayorEdadAlInicio(Nodo padre) {
+        Nodo primero = padre.getLiga();
+
+        if (primero != null) {
+            Nodo mayorEdad = primero;
+            Nodo anteriorMayorEdad = padre;
+            Nodo anterior = primero;
+            Nodo actual = primero.getLiga();
+
+            while (actual != null) {
+                // Una fecha de nacimiento anterior corresponde a una persona
+                // de mayor edad.
+                if (actual.getPersona().getFecha_nacimiento().before(
+                        mayorEdad.getPersona().getFecha_nacimiento())) {
+                    mayorEdad = actual;
+                    anteriorMayorEdad = anterior;
+                }
+                anterior = actual;
+                actual = actual.getLiga();
+            }
+
+            if (mayorEdad != primero) {
+                anteriorMayorEdad.setLiga(mayorEdad.getLiga());
+                mayorEdad.setLiga(primero);
+                padre.setLiga(mayorEdad);
+            }
+        }
+    }
+
+    // Elimina una hoja directamente. Si p tiene descendencia, su hijo de mayor
+    // edad ocupa su lugar y conserva el resto del linaje.
     public void eliminar(Nodo p, Nodo padre) {
         Nodo s, q, ant;
 
@@ -313,15 +380,24 @@ public class Lista {
                 if (p == ancestro) {
                     s = ancestro;
                 } else {
+                    // En un nodo con hijos, la cabecera de la sublista contiene
+                    // la informacion de la persona que se va a reemplazar.
                     s = p.getLigaLista();
                 }
 
+                // La lista se ajusta temporalmente para que el hijo de mayor edad
+                // sea quien ascienda en la jerarquia.
+                colocarHijoMayorEdadAlInicio(s);
                 q = s.getLiga();
 
                 if (q != null) {
+                    // La cabecera conserva su posicion, pero adopta los datos del
+                    // hijo promovido para no desconectar el resto de la rama.
                     s.setPersona(q.getPersona());
 
                     if (q.getSw() == 1) {
+                        // Si el hijo promovido tambien era padre, su sublista debe
+                        // integrarse y reordenarse en la nueva posicion.
                         eliminar(q, s);
                         ordenar(q, s);
                     } else {
@@ -338,6 +414,33 @@ public class Lista {
         }
     }
 
+    // Busca una persona por su cedula y la elimina conservando su descendencia.
+    public void eliminarPersona(Integer cedula) {
+        if (ancestro == null) {
+            System.out.println("Arbol vacio");
+        } else if (!existe(cedula)) {
+            System.out.println("No existe una persona con la cedula " + cedula);
+        } else if (ancestro.getCedula().equals(cedula)) {
+            eliminar(ancestro, ancestro);
+            System.out.println("Persona eliminada correctamente");
+        } else {
+            Nodo padre = buscarPadre(ancestro, cedula);
+            Nodo persona = buscarEnLista(padre, cedula);
+            Boolean teniaHijos = persona.getSw() == 1;
+
+            eliminar(persona, padre);
+
+            // Al promover a un hijo cambia la cedula representada por el nodo;
+            // por eso debe recuperar su posicion en la lista de hermanos.
+            if (teniaHijos == true) {
+                ordenar(persona, padre);
+            }
+
+            System.out.println("Persona eliminada correctamente");
+        }
+    }
+
+    // Inicia la eliminacion de una generacion y reporta si no fue hallada.
     public void eliminarPorNIvel(int nivelBus) {
         Boolean sw = false;
 
@@ -355,19 +458,26 @@ public class Lista {
         }
     }
 
+    // Elimina de derecha a izquierda los nodos del nivel para evitar perder
+    // enlaces; cuando hay sublista, reubica la rama que asciende.
     private void eliminarLista(Nodo x, Nodo padre) {
         if (x != null) {
+            // Se procesa primero el siguiente hermano para que los cambios de
+            // enlaces no impidan visitar los demas nodos del nivel.
             eliminarLista(x.getLiga(), padre);
             Boolean teniaSublista = x.getSw() == 1;
             eliminar(x, padre);
             if (teniaSublista == true) {
+                // La rama que ascendio tras eliminar al padre vuelve a ubicarse
+                // segun el orden de cedulas de la lista superior.
                 ordenar(x, padre);
             }
         }
     }
 
+    // Busca el nivel solicitado. Al encontrarlo elimina sus nodos, mientras
+    // que los descendientes se conectan con el abuelo y ascienden un nivel.
     public Boolean eliminarPorNIvel(Nodo p, int nivelBus, int nivel) {
-
         Boolean sw = false;
         Nodo q = p.getLiga();
         if (nivel == nivelBus) {
@@ -384,6 +494,8 @@ public class Lista {
                         sw = true;
                     }
                     if (padreSub.getLiga() == null) {
+                        // Si la sublista queda sin hijos, el nodo deja de ser una
+                        // sublista y vuelve a almacenar directamente a la persona.
                         q.setPersona(padreSub.getPersona());
                         q.setLigaLista(null);
                         q.setSw(0);
@@ -396,10 +508,12 @@ public class Lista {
         return sw;
     }
 
+    // Comprueba la raiz y, si es necesario, toda su descendencia.
     private Boolean existe(Integer ced) {
         return ancestro.getCedula().equals(ced) || esDescendiente(ancestro, ced);
     }
 
+    // Busca una cedula dentro de todas las ramas que nacen de padre.
     private Boolean esDescendiente(Nodo padre, Integer ced) {
         Boolean sw = false;
         Nodo q = padre.getLiga();
@@ -408,6 +522,8 @@ public class Lista {
                 sw = true;
             } else {
                 if (q.getSw() == 1) {
+                    // Se usa la cabecera de la sublista para conservar como punto
+                    // de partida a la persona que encabeza esa rama.
                     sw = esDescendiente(q.getLigaLista(), ced);
                 }
             }
@@ -416,6 +532,7 @@ public class Lista {
         return sw;
     }
 
+    // Valida las cedulas y muestra el ascendiente compartido mas cercano.
     public void ancestroComun(Integer a, Integer b) {
         if (ancestro == null) {
             System.out.println("Arbol vacio");
@@ -431,6 +548,8 @@ public class Lista {
         }
     }
 
+    // Desciende mientras ambas personas permanezcan dentro de una misma
+    // sublista; la ultima cabecera comun es el ancestro mas cercano.
     private Nodo ancestroComun(Nodo padre, Integer a, Integer b) {
         Nodo res = padre;
         Boolean sw = false;
@@ -438,6 +557,8 @@ public class Lista {
         while (q != null && sw == false) {
             if (q.getSw() == 1) {
                 Nodo sub = q.getLigaLista();
+                // Solo se desciende por una rama cuando ambas personas siguen
+                // estando dentro de ella; asi se conserva el ancestro mas cercano.
                 if (esDescendiente(sub, a) && esDescendiente(sub, b)) {
                     res = ancestroComun(sub, a, b);
                     sw = true;
@@ -448,6 +569,7 @@ public class Lista {
         return res;
     }
 
+    // Devuelve la cabecera de la lista que contiene como hijo a la cedula.
     private Nodo buscarPadre(Nodo padre, Integer ced) {
         Nodo res = null;
         Nodo q = padre.getLiga();
@@ -464,6 +586,7 @@ public class Lista {
         return res;
     }
 
+    // Busca un nodo solamente entre los hijos directos de padre.
     private Nodo buscarEnLista(Nodo padre, Integer ced) {
         Nodo q = padre.getLiga();
         while (q != null && !q.getCedula().equals(ced)) {
@@ -472,6 +595,8 @@ public class Lista {
         return q;
     }
 
+    // Valida la adopcion: A debe existir, no puede ser la raiz y B no puede
+    // pertenecer a la descendencia de A porque se produciria un ciclo.
     public void trasladarRama(Integer a, Integer b) {
         if (ancestro == null) {
             System.out.println("Arbol vacio");
@@ -500,16 +625,21 @@ public class Lista {
         }
     }
 
+    // Desconecta a A de su padre, ajusta al padre anterior si queda sin hijos
+    // y enlaza la rama completa en la lista de hijos de B segun su cedula.
     private void moverRama(Nodo nodoA, Nodo cabPadreA, Integer b) {
-
         Nodo ant = cabPadreA;
         while (ant.getLiga() != nodoA) {
             ant = ant.getLiga();
         }
+        // Se retira A de la lista de hermanos sin modificar su posible sublista,
+        // por lo que toda su descendencia viaja junto con el nodo.
         ant.setLiga(nodoA.getLiga());
         nodoA.setLiga(null);
 
         if (cabPadreA.getLiga() == null && cabPadreA != ancestro) {
+            // Si el padre anterior queda sin hijos, deja de representarse como
+            // sublista y vuelve a ser un nodo hoja dentro de la lista del abuelo.
             Nodo cabAbuelo = buscarPadre(ancestro, cabPadreA.getCedula());
             Nodo nodoPadre = buscarEnLista(cabAbuelo, cabPadreA.getCedula());
             nodoPadre.setPersona(cabPadreA.getPersona());
@@ -526,6 +656,8 @@ public class Lista {
             if (nodoB.getSw() == 1) {
                 cabB = nodoB.getLigaLista();
             } else {
+                // Si B era una hoja, se crea la cabecera que permitira enlazar
+                // a A como su primer hijo.
                 cabB = new Nodo(nodoB.getPersona(), null);
                 nodoB.setLigaLista(cabB);
                 nodoB.setSw(1);
@@ -535,7 +667,9 @@ public class Lista {
 
         ant = cabB;
         Nodo q = cabB.getLiga();
-        while (q != null && q.getCedula() > nodoA.getCedula()) {
+        // Se localiza la posicion de A de menor a mayor cedula dentro de sus
+        // nuevos hermanos antes de volver a enlazar la rama completa.
+        while (q != null && q.getCedula() < nodoA.getCedula()) {
             ant = q;
             q = q.getLiga();
         }
@@ -543,6 +677,8 @@ public class Lista {
         ant.setLiga(nodoA);
     }
 
+    // Busca al padre y recorre unicamente su lista de hijos directos.
+    // Retorna true cuando la persona no fue encontrada.
     public boolean MostrarTodosLosHijos(Nodo p, int cedpadre, boolean sw) {
         Nodo q = p;
         while (q != null && sw) {
@@ -574,6 +710,8 @@ public class Lista {
 
     }
 
+    // Localiza a la persona y muestra los demas integrantes de la misma
+    // lista de hijos, es decir, quienes comparten su padre.
     public boolean MostrarHermanos(Nodo p, int cedhermano, boolean sw) {
         Nodo q = p;
         while (q != null && sw) {
@@ -607,6 +745,7 @@ public class Lista {
 
     }
 
+    // Cuenta los hijos de la cabecera p, excluyendo a la persona consultada.
     public int ConteoHermanos(Nodo p, int ced) {
         int count = 0;
         Nodo q = p.getLiga();
@@ -619,6 +758,8 @@ public class Lista {
         return count;
     }
 
+    // Busca a la persona, obtiene la cedula de su padre mediante la cabecera
+    // de la lista y solicita los hermanos de ese padre.
     public boolean MostrarTios(Nodo p, int cedpersona, boolean sw) {
         Nodo q = p;
         while (q != null && sw) {
@@ -644,6 +785,7 @@ public class Lista {
         return sw;
     }
 
+    // Localiza al padre y muestra sus hermanos dentro de la lista del abuelo.
     public boolean MostrarHermanosDelPadre(Nodo p, int cedPadre, boolean sw) {
         Nodo q = p;
         while (q != null && sw) {
@@ -677,6 +819,8 @@ public class Lista {
         return sw;
     }
 
+    // Recorre los hermanos de la persona y muestra los hijos directos de
+    // aquellos que tengan una sublista de descendientes.
     public boolean MostrarSobrinos(Nodo p, int cedpersona, boolean sw) {
         Nodo q = p;
         while (q != null && sw) {
@@ -713,6 +857,7 @@ public class Lista {
         return sw;
     }
 
+    // Obtiene al padre de la persona para buscar los hijos de sus hermanos.
     public boolean MostrarPrimos(Nodo p, int cedpersona, boolean sw) {
         Nodo q = p;
         while (q != null && sw) {
@@ -738,6 +883,8 @@ public class Lista {
         return sw;
     }
 
+    // Localiza a la persona y recorre su linea ascendente directa mediante
+    // busquedas sucesivas del padre, hasta alcanzar el ancestro principal.
     public boolean MostrarAncestros(Nodo p, int cedpersona, boolean sw) {
         Nodo q = p;
 
@@ -772,6 +919,8 @@ public class Lista {
         return sw;
     }
 
+    // Localiza a la persona y recorre en profundidad toda su descendencia.
+    // La pila conserva las ramas de hermanos pendientes durante el recorrido.
     public boolean MostrarDescendientes(Nodo p, int cedpersona, boolean sw) {
         Nodo q = p;
 
@@ -796,12 +945,18 @@ public class Lista {
                     Deque<Nodo> pila = new ArrayDeque<>();
                     pila.push(primerHijo);
 
+                    // La pila guarda los hermanos pendientes cuando el recorrido
+                    // baja primero por la sublista de descendientes de un nodo.
                     while (!pila.isEmpty()) {
                         Nodo actual = pila.pop();
                         while (actual != null) {
                             System.out.println(actual.getPersona().toString());
                             if (actual.getSw() == 1) {
-                                pila.push(actual.getLiga());
+                                // ArrayDeque no admite null; solo se guarda el
+                                // hermano cuando realmente existe.
+                                if (actual.getLiga() != null) {
+                                    pila.push(actual.getLiga());
+                                }
                                 actual = actual.getLigaLista().getLiga();
                             } else {
                                 actual = actual.getLiga();
@@ -819,6 +974,8 @@ public class Lista {
         return sw;
     }
 
+    // Imprime la jerarquia completa con prefijos que representan las ramas.
+    // Los hijos se apilan en orden inverso para mostrarlos en su orden original.
     public void visualizarArbol() {
         if (ancestro == null) {
             System.out.println("Arbol vacio");
@@ -841,10 +998,14 @@ public class Lista {
             h = h.getLiga();
         }
         for (int i = hijosRaiz.size() - 1; i >= 0; i--) {
+            // Se apilan en orden inverso porque la pila extrae primero el ultimo
+            // elemento insertado y deben imprimirse en el orden original.
             pila.push(new Object[]{hijosRaiz.get(i), "", i == hijosRaiz.size() - 1});
         }
 
         while (!pila.isEmpty()) {
+            // Cada arreglo conserva el nodo, el prefijo visual acumulado y si
+            // corresponde al ultimo hijo de su lista.
             Object[] actual = pila.pop();
             Nodo p = (Nodo) actual[0];
             String prefijo = (String) actual[1];
@@ -864,6 +1025,8 @@ public class Lista {
                     hijo = hijo.getLiga();
                 }
                 for (int i = hijos.size() - 1; i >= 0; i--) {
+                    // El nuevo prefijo mantiene visibles las conexiones con las
+                    // generaciones superiores al imprimir cada hijo.
                     pila.push(new Object[]{hijos.get(i), nuevoPrefijo, i == hijos.size() - 1});
                 }
             }
@@ -872,6 +1035,8 @@ public class Lista {
         System.out.println("========================================");
     }
 
+    // Recorre todo el arbol y compara la cantidad de hijos directos de cada
+    // persona para conservar el nodo con el mayor grado encontrado.
     public void mostrarNodoMayorGrado() {
         if (ancestro == null) {
             System.out.println("Arbol vacio");
@@ -911,6 +1076,8 @@ public class Lista {
                         mejor = actual;
                     }
 
+                    // El hermano se guarda para visitarlo despues de terminar la
+                    // rama que comienza en el primer hijo.
                     Nodo hermano = actual.getLiga();
                     if (hermano != null) {
                         pila.push(hermano);
@@ -926,6 +1093,8 @@ public class Lista {
         System.out.println(mejor.getPersona().toString());
     }
 
+    // Recorre todas las ramas y conserva la persona cuya fecha de nacimiento
+    // sea mas reciente, es decir, la de menor edad.
     public void mostrarFamiliarMasJoven() {
         if (ancestro == null) {
             System.out.println("Arbol vacio");
@@ -965,6 +1134,8 @@ public class Lista {
         System.out.println(masJoven.getPersona().toString());
     }
 
+    // Recorre el arbol guardando el nivel de cada rama pendiente y conserva
+    // el nivel maximo como la cantidad total de generaciones.
     public void mostrarAlturaArbol() {
         if (ancestro == null) {
             System.out.println("Arbol vacio");
@@ -980,6 +1151,8 @@ public class Lista {
         }
 
         while (!pila.isEmpty()) {
+            // Cada entrada relaciona el primer nodo pendiente de una rama con el
+            // nivel al que pertenece dentro del arbol.
             Object[] datos = pila.pop();
             Nodo actual = (Nodo) datos[0];
             int nivel = (int) datos[1];
@@ -993,6 +1166,8 @@ public class Lista {
                     Nodo primerHijo = actual.getLigaLista().getLiga();
                     Nodo hermano = actual.getLiga();
                     if (hermano != null) {
+                        // El hermano conserva el nivel actual; solamente los hijos
+                        // se procesan en el nivel siguiente.
                         pila.push(new Object[]{hermano, nivel});
                     }
                     actual = primerHijo;
@@ -1006,6 +1181,9 @@ public class Lista {
         System.out.println("Altura del arbol (cantidad de generaciones): " + alturaMax);
     }
 
+    // Valida la existencia de la persona y que la nueva cedula no se repita;
+    // despues actualiza sus datos y, si cambia la cedula, reordena su nodo
+    // dentro de la lista de hermanos correspondiente.
     public void actualizarPersona(Integer cedulaVieja, String nuevoNombre, Integer cedulaNueva, Date nuevaFecha) {
         if (ancestro == null) {
             System.out.println("Arbol vacio");
@@ -1041,6 +1219,8 @@ public class Lista {
                 while (ant.getLiga() != nodo) {
                     ant = ant.getLiga();
                 }
+                // Primero se extrae el nodo de su posicion actual para evitar
+                // romper la lista mientras se busca su nueva ubicacion.
                 ant.setLiga(nodo.getLiga());
 
                 ant = padre;
@@ -1049,6 +1229,7 @@ public class Lista {
                     ant = q;
                     q = q.getLiga();
                 }
+                // Finalmente se vuelve a enlazar respetando el orden por cedula.
                 nodo.setLiga(q);
                 ant.setLiga(nodo);
             }
@@ -1058,10 +1239,13 @@ public class Lista {
         System.out.println(persona.toString());
     }
 
+    // Expone la busqueda de cedula evitando consultar una estructura vacia.
     public Boolean existeCedula(Integer ced) {
         return ancestro != null && existe(ced);
     }
 
+    // Localiza al padre y recorre los hijos de sus hermanos; esos nodos son
+    // los primos de la persona que origino la consulta.
     public boolean MostrarSobrinosDelPadre(Nodo p, int cedPadre, boolean sw) {
         Nodo q = p;
         while (q != null && sw) {
