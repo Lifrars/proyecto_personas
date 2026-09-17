@@ -14,12 +14,13 @@ public class Nodo {
     private Nodo ligaLista;
     private Persona persona;
 
+    //Constructor para crear una persona
     public Nodo (  Persona persona,Nodo sig) {
         this.sw = 0;
         this.liga = sig;
         this.persona = persona;
     }
-    
+    //Constructor para crear una sublista
     public Nodo (Nodo sublista, Nodo sig) {
         this.sw = 1;
         this.liga = sig;
@@ -49,7 +50,7 @@ public class Nodo {
     public void setLigaLista(Nodo ligaLista) {
         this.ligaLista = ligaLista;
     }
-
+    //Este metodo trae la persona independientemente de si el nodo es una sublista o un dato atómico
     public Persona getPersona() {
         if (sw == 0) {
             return persona;
@@ -61,7 +62,7 @@ public class Nodo {
     public void setPersona(Persona persona) {
         this.persona = persona;
     }
-    
+    //Este metodo trae la cedula independientemente de si el nodo es una sublista o un dato atómico
     public Integer getCedula() {
         if (sw == 0) {
             return persona.getCedula();

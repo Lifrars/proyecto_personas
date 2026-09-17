@@ -6,7 +6,8 @@ import java.util.Date;
 import javax.swing.JOptionPane;
 
 public class Personas {
-
+    // Crea el arbol y mantiene activo el menu hasta que el usuario cancele
+    // o seleccione la opcion de salida.
     public static void main(String[] args) {
         Lista lista = new Lista();
         Boolean salir = false;
@@ -36,6 +37,7 @@ public class Personas {
                     + "21. Visualizar la persona con la menor edad\n"
                     + "22. Visualizar la cantidad de generaciones\n"
                     + "23. Actualizar Persona\n"
+                    + "24. Eliminar persona por cedula\n"
                     + "0. Salir");
 
             if (opcion == null || opcion.trim().equals("0")) {
@@ -45,7 +47,8 @@ public class Personas {
             }
         }
     }
-
+    // Dirige la opcion elegida hacia la operacion correspondiente y solicita
+    // solamente los datos necesarios para ejecutarla.
     private static void ejecutar(Lista lista, String opcion) {
         Integer ced, ced2, nivel;
 
@@ -124,44 +127,58 @@ public class Personas {
 
             case "12":
                 ced = leerEntero("Ingrese la cedula del padre para mostrar los hijos");
-                if (lista.MostrarTodosLosHijos(lista.getAncestro(), ced, true)) {
-                    JOptionPane.showMessageDialog(null, "Persona no encontrada");
+                if (ced != null) {
+                    if (lista.MostrarTodosLosHijos(lista.getAncestro(), ced, true)) {
+                        JOptionPane.showMessageDialog(null, "Persona no encontrada");
+                    }
                 }
                 break;
             case "13":
                 ced = leerEntero("Ingrese la cedula de el hermano para mostrar los hermanos");
-                if (lista.MostrarHermanos(lista.getAncestro(), ced, true)) {
-                    JOptionPane.showMessageDialog(null, "Persona no encontrada");
+                if (ced != null) {
+                    if (lista.MostrarHermanos(lista.getAncestro(), ced, true)) {
+                        JOptionPane.showMessageDialog(null, "Persona no encontrada");
+                    }
                 }
                 break;
             case "14":
                 ced = leerEntero("Ingrese la cedula de la persona para mostrar los tios");
-                if (lista.MostrarTios(lista.getAncestro(), ced, true)) {
-                    JOptionPane.showMessageDialog(null, "Persona no encontrada");
+                if (ced != null) {
+                    if (lista.MostrarTios(lista.getAncestro(), ced, true)) {
+                        JOptionPane.showMessageDialog(null, "Persona no encontrada");
+                    }
                 }
                 break;
             case "15":
                 ced = leerEntero("Ingrese la cedula de la persona para mostrar los sobrinos");
-                if (lista.MostrarSobrinos(lista.getAncestro(), ced, true)) {
-                    JOptionPane.showMessageDialog(null, "Persona no encontrada");
+                if (ced != null) {
+                    if (lista.MostrarSobrinos(lista.getAncestro(), ced, true)) {
+                        JOptionPane.showMessageDialog(null, "Persona no encontrada");
+                    }
                 }
                 break;
             case "16":
                 ced = leerEntero("Ingrese la cedula de la persona para mostrar los primos");
-                if (lista.MostrarPrimos(lista.getAncestro(), ced, true)) {
-                    JOptionPane.showMessageDialog(null, "Persona no encontrada");
+                if (ced != null) {
+                    if (lista.MostrarPrimos(lista.getAncestro(), ced, true)) {
+                        JOptionPane.showMessageDialog(null, "Persona no encontrada");
+                    }
                 }
                 break;
             case "17":
                 ced = leerEntero("Ingrese la cedula de la persona para mostrar los Ancestros");
-                if (lista.MostrarAncestros(lista.getAncestro(), ced, true)) {
-                    JOptionPane.showMessageDialog(null, "Persona no encontrada");
+                if (ced != null) {
+                    if (lista.MostrarAncestros(lista.getAncestro(), ced, true)) {
+                        JOptionPane.showMessageDialog(null, "Persona no encontrada");
+                    }
                 }
                 break;
             case "18":
                 ced = leerEntero("Ingrese la cedula de la persona para mostrar los Descendientes");
-                if (lista.MostrarDescendientes(lista.getAncestro(), ced, true)) {
-                    JOptionPane.showMessageDialog(null, "Persona no encontrada");
+                if (ced != null) {
+                    if (lista.MostrarDescendientes(lista.getAncestro(), ced, true)) {
+                        JOptionPane.showMessageDialog(null, "Persona no encontrada");
+                    }
                 }
                 break;
             case "19":
@@ -179,12 +196,19 @@ public class Personas {
             case "23":
                 actualizarPersona(lista);
                 break;
+            case "24":
+                ced = leerEntero("Cedula de la persona que desea eliminar:");
+                if (ced != null) {
+                    lista.eliminarPersona(ced);
+                }
+                break;
 
             default:
-                JOptionPane.showMessageDialog(null, "Elija una opcion entre 0 y 11");
+                JOptionPane.showMessageDialog(null, "Elija una opcion entre 0 y 24");
         }
     }
-
+    // Solicita y valida los nuevos datos antes de delegar la actualizacion
+    // y el posible reordenamiento del nodo a la estructura Lista.
     private static void actualizarPersona(Lista lista) {
         if (lista.getAncestro() == null) {
             JOptionPane.showMessageDialog(null, "Arbol vacio");
@@ -247,7 +271,7 @@ public class Personas {
         }
         return num;
     }
-
+// Lee y valida que el nivel pertenezca al rango positivo del arbol.
     private static Integer leerNivel(String mensaje) {
         Integer nivel = leerEntero(mensaje);
         if (nivel != null && nivel < 1) {
@@ -256,11 +280,11 @@ public class Personas {
         }
         return nivel;
     }
-
+    // Solicita padre solo cuando ya existe una raiz; luego crea la persona
+    // y delega en Lista su insercion dentro de la estructura.
     private static void insertar(Lista lista) {
         Integer cedPadre = 0;
         Boolean seguir = true;
-
         // si el arbol esta vacio, la persona sera el ancestro y no se pide padre
         if (lista.getAncestro() != null) {
             cedPadre = leerEntero("Cedula del padre donde va a insertar:");
@@ -276,7 +300,8 @@ public class Personas {
             }
         }
     }
-
+    // Construye una persona a partir de datos validados: nombre no vacio,
+    // cedula positiva y fecha real que no sea posterior al dia actual.
     public static Persona crearPersona() {
         Persona persona = null;
 
@@ -309,6 +334,7 @@ public class Personas {
     }
 
     // ---------- DATOS DE PRUEBA ----------
+    // Convierte una fecha textual valida en el objeto usado por los datos de prueba.
     private static Persona nuevaPersona(String nombre, int cedula, String fecha) {
         Persona persona = null;
         try {
@@ -322,6 +348,8 @@ public class Personas {
     }
 
     public static void cargarDatosPrueba(Lista lista) {
+        // Forma un arbol de varias generaciones para ejercitar inserciones,
+        // ordenamiento por cedula, recorridos y operaciones entre ramas.
         Nodo a = null; // solo para legibilidad, siempre se pasa lista.getAncestro()
 
         // Nivel 1: ancestro (la cedula del padre se ignora porque el arbol esta vacio)
