@@ -17,8 +17,6 @@ El ancestro principal se guarda en la variable `ancestro` de la clase `Lista`. C
 
 La inserción se realiza buscando de forma recursiva la cédula del padre. Durante el recorrido se revisan primero los nodos de la lista actual y, cuando se encuentra una sublista, se continúa por sus hijos. Al encontrar al padre, el nuevo nodo se ubica entre sus hermanos por cédula, de menor a mayor. Esto evita tener que ordenar toda la lista después de cada registro.
 
-La misma idea de recorrer listas y sublistas se usa para consultar padres, hermanos, tíos, sobrinos, primos, ancestros y descendientes. Algunas consultas son recursivas y otras utilizan una pila con `ArrayDeque`. La pila fue útil en operaciones como mostrar los descendientes, visualizar el árbol completo, calcular la altura y buscar la persona con más hijos, porque permite bajar por una rama sin olvidar los hermanos que todavía faltan por visitar.
-
 Para visualizar el árbol se guarda en la pila el nodo, el prefijo que se debe imprimir y un valor que indica si es el último hijo. Así se pueden mostrar líneas como `|--` y `` `-- `` para diferenciar las ramas y las generaciones.
 
 ## Dificultades y soluciones
@@ -40,7 +38,5 @@ Para encontrar el ancestro común más cercano se revisa si las dos personas per
 Con esta práctica entendimos mejor que un árbol no depende solamente de crear nodos, sino de mantener correctamente las referencias entre ellos. Un cambio pequeño en una liga puede desconectar una persona, una lista de hermanos o una rama completa. Por eso fue importante revisar qué referencia se debía conservar antes de hacer una inserción, eliminación o traslado.
 
 También practicamos recursividad en una estructura que no tiene un número fijo de hijos. A diferencia de una lista lineal, en cada nodo se debe decidir si se continúa con el siguiente hermano o si se baja a una sublista. Al principio este recorrido no era tan fácil de seguir, pero separar los métodos de búsqueda ayudó a entender mejor cada caso.
-
-El uso de pilas permitió comparar los recorridos recursivos con una solución iterativa. Guardar temporalmente los hermanos pendientes hizo posible recorrer el árbol en profundidad y, al mismo tiempo, calcular datos como la altura o el nodo con mayor grado.
 
 Finalmente, la práctica ayudó a relacionar conceptos vistos por separado durante la carrera: listas enlazadas, recursividad, pilas y árboles. Lo más importante fue comprender que las operaciones deben conservar la estructura completa, no solamente producir el resultado visible. En este proyecto, verificar los enlaces después de cada cambio fue tan importante como encontrar la persona buscada.
