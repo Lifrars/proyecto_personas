@@ -373,9 +373,7 @@ public class Personas {
         lista.insertarPersona(lista.getAncestro(), nuevaPersona("Fernanda Ramirez", 1258, "07/07/2015"), 1250);
         lista.insertarPersona(lista.getAncestro(), nuevaPersona("Felipe Ramirez", 1252, "03/03/2013"), 1250);
 
-        // Nivel 5: hijo de 1252. 1800 se queda como hoja
-        lista.insertarPersona(lista.getAncestro(), nuevaPersona("Gabriel Ramirez", 1255, "11/11/2025"), 1252);
 
-        JOptionPane.showMessageDialog(null, "Datos de prueba cargados (12 personas).");
+        JOptionPane.showMessageDialog(null, "Datos de prueba cargados (11 personas).");
     }
 }

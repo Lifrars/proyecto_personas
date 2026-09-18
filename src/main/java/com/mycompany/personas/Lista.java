@@ -51,7 +51,29 @@ public class Lista {
             }
         }
     }
-
+    // Comprueba la raiz y, si es necesario, toda su descendencia.
+    private Boolean existe(Integer ced) {
+        return ancestro.getCedula().equals(ced) || esDescendiente(ancestro, ced);
+    }
+    
+    // Busca una cedula dentro de todas las ramas que nacen de padre.
+    private Boolean esDescendiente(Nodo padre, Integer ced) {
+        Boolean sw = false;
+        Nodo q = padre.getLiga();
+        while (q != null && sw == false) {
+            if (q.getCedula().equals(ced)) {
+                sw = true;
+            } else {
+                if (q.getSw() == 1) {
+                    // Se usa la cabecera de la sublista para conservar como punto
+                    // de partida a la persona que encabeza esa rama.
+                    sw = esDescendiente(q.getLigaLista(), ced);
+                }
+            }
+            q = q.getLiga();
+        }
+        return sw;
+    }
     // Recorre recursivamente las listas de hermanos hasta localizar al padre.
     // Inserta el nuevo hijo por cedula de menor a mayor y convierte al padre en
     // sublista cuando recibe su primer descendiente.
@@ -140,6 +162,7 @@ public class Lista {
             if (ancestro.getCedula().equals(ced)) {
                 System.out.println("El Ancestro no tiene padre");
             } else {
+                System.out.println("El padre es \n");
                 System.out.println(p.getPersona().toString());
             }
 
@@ -508,30 +531,8 @@ public class Lista {
         return sw;
     }
 
-    // Comprueba la raiz y, si es necesario, toda su descendencia.
-    private Boolean existe(Integer ced) {
-        return ancestro.getCedula().equals(ced) || esDescendiente(ancestro, ced);
-    }
 
-    // Busca una cedula dentro de todas las ramas que nacen de padre.
-    private Boolean esDescendiente(Nodo padre, Integer ced) {
-        Boolean sw = false;
-        Nodo q = padre.getLiga();
-        while (q != null && sw == false) {
-            if (q.getCedula().equals(ced)) {
-                sw = true;
-            } else {
-                if (q.getSw() == 1) {
-                    // Se usa la cabecera de la sublista para conservar como punto
-                    // de partida a la persona que encabeza esa rama.
-                    sw = esDescendiente(q.getLigaLista(), ced);
-                }
-            }
-            q = q.getLiga();
-        }
-        return sw;
-    }
-
+    
     // Valida las cedulas y muestra el ascendiente compartido mas cercano.
     public void ancestroComun(Integer a, Integer b) {
         if (ancestro == null) {
@@ -607,16 +608,16 @@ public class Lista {
                 if (ancestro.getCedula().equals(a)) {
                     System.out.println("No se puede trasladar la raiz");
                 } else {
-                    Nodo cabPadreA = buscarPadre(ancestro, a);
-                    Nodo nodoA = buscarEnLista(cabPadreA, a);
+                    Nodo PadreAntiguo = buscarPadre(ancestro, a);
+                    Nodo nodoA = buscarEnLista(PadreAntiguo, a);
 
                     if (nodoA.getSw() == 1 && esDescendiente(nodoA.getLigaLista(), b)) {
                         System.out.println("B es descendiente de A, no se puede");
                     } else {
-                        if (cabPadreA.getCedula().equals(b)) {
+                        if (PadreAntiguo.getCedula().equals(b)) {
                             System.out.println("B ya es el padre de A");
                         } else {
-                            moverRama(nodoA, cabPadreA, b);
+                            moverRama(nodoA, PadreAntiguo, b);
                             System.out.println("Rama trasladada");
                         }
                     }
@@ -627,8 +628,8 @@ public class Lista {
 
     // Desconecta a A de su padre, ajusta al padre anterior si queda sin hijos
     // y enlaza la rama completa en la lista de hijos de B segun su cedula.
-    private void moverRama(Nodo nodoA, Nodo cabPadreA, Integer b) {
-        Nodo ant = cabPadreA;
+    private void moverRama(Nodo nodoA, Nodo PadreAntiguo, Integer b) {
+        Nodo ant = PadreAntiguo;
         while (ant.getLiga() != nodoA) {
             ant = ant.getLiga();
         }
@@ -637,36 +638,36 @@ public class Lista {
         ant.setLiga(nodoA.getLiga());
         nodoA.setLiga(null);
 
-        if (cabPadreA.getLiga() == null && cabPadreA != ancestro) {
+        if (PadreAntiguo.getLiga() == null && PadreAntiguo != ancestro) {
             // Si el padre anterior queda sin hijos, deja de representarse como
             // sublista y vuelve a ser un nodo hoja dentro de la lista del abuelo.
-            Nodo cabAbuelo = buscarPadre(ancestro, cabPadreA.getCedula());
-            Nodo nodoPadre = buscarEnLista(cabAbuelo, cabPadreA.getCedula());
-            nodoPadre.setPersona(cabPadreA.getPersona());
+            Nodo Abuelo = buscarPadre(ancestro, PadreAntiguo.getCedula());
+            Nodo nodoPadre = buscarEnLista(Abuelo, PadreAntiguo.getCedula());
+            nodoPadre.setPersona(PadreAntiguo.getPersona());
             nodoPadre.setLigaLista(null);
             nodoPadre.setSw(0);
         }
 
-        Nodo cabB;
+        Nodo B;
         if (ancestro.getCedula().equals(b)) {
-            cabB = ancestro;
+            B = ancestro;
         } else {
-            Nodo cabPadreB = buscarPadre(ancestro, b);
-            Nodo nodoB = buscarEnLista(cabPadreB, b);
+            Nodo PadreB = buscarPadre(ancestro, b);
+            Nodo nodoB = buscarEnLista(PadreB, b);
             if (nodoB.getSw() == 1) {
-                cabB = nodoB.getLigaLista();
+                B = nodoB.getLigaLista();
             } else {
                 // Si B era una hoja, se crea la cabecera que permitira enlazar
                 // a A como su primer hijo.
-                cabB = new Nodo(nodoB.getPersona(), null);
-                nodoB.setLigaLista(cabB);
+                B = new Nodo(nodoB.getPersona(), null);
+                nodoB.setLigaLista(B);
                 nodoB.setSw(1);
                 nodoB.setPersona(null);
             }
         }
 
-        ant = cabB;
-        Nodo q = cabB.getLiga();
+        ant = B;
+        Nodo q = B.getLiga();
         // Se localiza la posicion de A de menor a mayor cedula dentro de sus
         // nuevos hermanos antes de volver a enlazar la rama completa.
         while (q != null && q.getCedula() < nodoA.getCedula()) {
